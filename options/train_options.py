@@ -84,7 +84,7 @@ class TrainOptions:
                                  help='Target age for training. Use `uniform_random` for random sampling of target age')
         self.parser.add_argument('--use_weighted_id_loss', action="store_true",
                                  help="Whether to weight id loss based on change in age (more change -> less weight)")
-        self.parser.add_argument('--pretrained_psp_path', default=model_paths['pretrained_psp'], type=str,
+        self.parser.add_argument('--pretrained_psp_path', default='/home/e.konyagin/pixel2style2pixel/path/checkpoints/best_model.pt', type=str,
                                  help="Path to pretrained pSp network.")
 
     def parse(self):
