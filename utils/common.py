@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from PIL import Image
 
 
 # Log images
@@ -13,7 +12,7 @@ def tensor2im(var):
     var[var < 0] = 0
     var[var > 1] = 1
     var = var * 255
-    return var.astype("uint8")
+    return var.astype(np.uint8)
 
 
 def vis_faces(log_hooks):
