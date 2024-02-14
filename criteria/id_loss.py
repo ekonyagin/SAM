@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+
 from configs.paths_config import model_paths
 from models.encoders.model_irse import Backbone
 
@@ -7,9 +8,11 @@ from models.encoders.model_irse import Backbone
 class IDLoss(nn.Module):
     def __init__(self):
         super(IDLoss, self).__init__()
-        print('Loading ResNet ArcFace')
-        self.facenet = Backbone(input_size=112, num_layers=50, drop_ratio=0.6, mode='ir_se')
-        self.facenet.load_state_dict(torch.load(model_paths['ir_se50']))
+        print("Loading ResNet ArcFace")
+        self.facenet = Backbone(
+            input_size=112, num_layers=50, drop_ratio=0.6, mode="ir_se"
+        )
+        self.facenet.load_state_dict(torch.load(model_paths["ir_se50"]))
         self.face_pool = torch.nn.AdaptiveAvgPool2d((112, 112))
         self.facenet.eval()
 
@@ -35,13 +38,21 @@ class IDLoss(nn.Module):
             diff_views = y_feats[i].dot(x_feats[i])
 
             if label is None:
-                id_logs.append({'diff_target': float(diff_target),
-                                'diff_input': float(diff_input),
-                                'diff_views': float(diff_views)})
+                id_logs.append(
+                    {
+                        "diff_target": float(diff_target),
+                        "diff_input": float(diff_input),
+                        "diff_views": float(diff_views),
+                    }
+                )
             else:
-                id_logs.append({f'diff_target_{label}': float(diff_target),
-                                f'diff_input_{label}': float(diff_input),
-                                f'diff_views_{label}': float(diff_views)})
+                id_logs.append(
+                    {
+                        f"diff_target_{label}": float(diff_target),
+                        f"diff_input_{label}": float(diff_input),
+                        f"diff_views_{label}": float(diff_views),
+                    }
+                )
 
             loss = 1 - diff_target
             if weights is not None:

@@ -1,6 +1,6 @@
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
 from configs.paths_config import model_paths
 from models.dex_vgg import VGG
@@ -11,8 +11,10 @@ class AgingLoss(nn.Module):
     def __init__(self, opts):
         super(AgingLoss, self).__init__()
         self.age_net = VGG()
-        ckpt = torch.load(model_paths['age_predictor'], map_location="cpu")['state_dict']
-        ckpt = {k.replace('-', '_'): v for k, v in ckpt.items()}
+        ckpt = torch.load(model_paths["age_predictor"], map_location="cpu")[
+            "state_dict"
+        ]
+        ckpt = {k.replace("-", "_"): v for k, v in ckpt.items()}
         self.age_net.load_state_dict(ckpt)
         self.age_net.cuda()
         self.age_net.eval()
@@ -29,8 +31,8 @@ class AgingLoss(nn.Module):
         return predict_age
 
     def extract_ages(self, x):
-        x = F.interpolate(x, size=(224, 224), mode='bilinear')
-        predict_age_pb = self.age_net(x)['fc8']
+        x = F.interpolate(x, size=(224, 224), mode="bilinear")
+        predict_age_pb = self.age_net(x)["fc8"]
         predicted_age = self.__get_predicted_age(predict_age_pb)
         return predicted_age
 
@@ -40,20 +42,28 @@ class AgingLoss(nn.Module):
         if id_logs is None:
             id_logs = []
 
-        input_ages = self.extract_ages(y) / 100.
-        output_ages = self.extract_ages(y_hat) / 100.
+        input_ages = self.extract_ages(y) / 100.0
+        output_ages = self.extract_ages(y_hat) / 100.0
 
         for i in range(n_samples):
             # if id logs for the same exists, update the dictionary
             if len(id_logs) > i:
-                id_logs[i].update({f'input_age_{label}': float(input_ages[i]) * 100,
-                                   f'output_age_{label}': float(output_ages[i]) * 100,
-                                   f'target_age_{label}': float(target_ages[i]) * 100})
+                id_logs[i].update(
+                    {
+                        f"input_age_{label}": float(input_ages[i]) * 100,
+                        f"output_age_{label}": float(output_ages[i]) * 100,
+                        f"target_age_{label}": float(target_ages[i]) * 100,
+                    }
+                )
             # otherwise, create a new entry for the sample
             else:
-                id_logs.append({f'input_age_{label}': float(input_ages[i]) * 100,
-                                f'output_age_{label}': float(output_ages[i]) * 100,
-                                f'target_age_{label}': float(target_ages[i]) * 100})
+                id_logs.append(
+                    {
+                        f"input_age_{label}": float(input_ages[i]) * 100,
+                        f"output_age_{label}": float(output_ages[i]) * 100,
+                        f"target_age_{label}": float(target_ages[i]) * 100,
+                    }
+                )
 
         loss = F.mse_loss(output_ages, target_ages)
         return loss, id_logs
