@@ -21,6 +21,7 @@ class LPIPS(nn.Module):
         super(LPIPS, self).__init__()
 
         # pretrained network
+        print(f"Loading {net_type} for LPIPS")
         self.net = get_network(net_type).to("cuda")
 
         # linear layers
