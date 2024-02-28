@@ -14,7 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from configs import data_configs
 from criteria import id_loss, w_norm
-from criteria.aging_loss import AgingLoss
+from criteria.aging_loss_haut import AgingLoss
 from criteria.lpips.lpips import LPIPS
 from datasets.augmentations import AgeTransformer
 from datasets.images_dataset import ImagesDataset
