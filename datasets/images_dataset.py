@@ -6,42 +6,48 @@ from utils import data_utils
 
 class ImagesDataset(Dataset):
 
-    TARGET_SIZE = 256
+    _TARGET_SIZE = 256
 
     def __init__(
         self,
         source_root,
         target_root,
-        opts,
         target_transform=None,
         source_transform=None,
+        target_size=None,
     ):
         self.source_paths = sorted(data_utils.make_dataset(source_root))
         self.target_paths = sorted(data_utils.make_dataset(target_root))
         self.source_transform = source_transform
         self.target_transform = target_transform
-        self.opts = opts
+        self.target_size = None
+        if target_size is None:
+            self.target_size = self._TARGET_SIZE
+        else:
+            self.target_size = target_size
+        print("Target size:", self.target_size)
 
     def __len__(self):
         return len(self.source_paths)
 
     def __getitem__(self, index):
         from_path = self.source_paths[index]
+
         from_im = cv2.imread(from_path)
         from_im = cv2.cvtColor(from_im, cv2.COLOR_BGR2RGB)
         from_im = cv2.resize(
             from_im,
-            (self.TARGET_SIZE, self.TARGET_SIZE),
+            (self.target_size, self.target_size),
             interpolation=cv2.INTER_LINEAR,
         )
 
         to_path = self.target_paths[index]
+
         to_im = cv2.imread(to_path)
         to_im = cv2.cvtColor(to_im, cv2.COLOR_BGR2RGB)
         to_im = cv2.resize(
-            to_im, (self.TARGET_SIZE, self.TARGET_SIZE), interpolation=cv2.INTER_LINEAR
+            to_im, (self.target_size, self.target_size), interpolation=cv2.INTER_LINEAR
         )
-
         if self.target_transform:
             to_im = self.target_transform(to_im)
 

@@ -24,6 +24,9 @@ from utils import common, train_utils
 
 
 class Coach:
+
+    _TARGET_IMAGE_SIZE = 512
+
     def __init__(self, opts):
         self.opts = opts
 
@@ -38,7 +41,7 @@ class Coach:
         # Initialize loss
         self.mse_loss = nn.MSELoss().to(self.device).eval()
         if self.opts.lpips_lambda > 0:
-            self.lpips_loss = LPIPS(net_type="vgg").to(self.device).eval()
+            self.lpips_loss = LPIPS(net_type="alex").to(self.device).eval()
         if self.opts.id_lambda > 0:
             self.id_loss = id_loss.IDLoss().to(self.device).eval()
         if self.opts.w_norm_lambda > 0:
@@ -320,14 +323,14 @@ class Coach:
             target_root=dataset_args["train_target_root"],
             source_transform=transforms_dict["transform_source"],
             target_transform=transforms_dict["transform_gt_train"],
-            opts=self.opts,
+            target_size=self._TARGET_IMAGE_SIZE,
         )
         test_dataset = ImagesDataset(
             source_root=dataset_args["test_source_root"],
             target_root=dataset_args["test_target_root"],
             source_transform=transforms_dict["transform_source"],
             target_transform=transforms_dict["transform_test"],
-            opts=self.opts,
+            target_size=self._TARGET_IMAGE_SIZE,
         )
         print(f"Number of training samples: {len(train_dataset)}")
         print(f"Number of test samples: {len(test_dataset)}")
