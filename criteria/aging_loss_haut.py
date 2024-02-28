@@ -41,8 +41,8 @@ class AgingLoss(nn.Module):
 
         input_ages = self.extract_ages(y) / 100.0
         with torch.no_grad():
-            y_hat -= self.NORM_MEAN[:, None, None][None, ...]
-            y_hat /= self.NORM_STD[:, None, None][None, ...]
+            y_hat = y_hat - self.NORM_MEAN[:, None, None][None, ...]
+            y_hat = y_hat / self.NORM_STD[:, None, None][None, ...]
         output_ages = self.extract_ages(y_hat) / 100.0
 
         for i in range(n_samples):
