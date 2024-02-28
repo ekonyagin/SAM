@@ -11,7 +11,7 @@ class AgingLoss(nn.Module):
     def __init__(self, opts):
         super(AgingLoss, self).__init__()
         self.age_net = RegressionModel(model_name="convnext_pico", num_classes=100)
-        self, age_net.load_state_dict(
+        self.age_net.load_state_dict(
             torch.load("pretrained_models/age_model_cn_pico.pt", map_location="cpu")
         )
         self.age_net.cuda()
