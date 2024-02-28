@@ -15,7 +15,7 @@ from models.stylegan2.model import Generator
 
 
 class pSp(nn.Module):
-
+    _IMAGE_SIZE = (512, 512)
     def __init__(self, opts):
         super(pSp, self).__init__()
         self.set_opts(opts)
@@ -23,7 +23,7 @@ class pSp(nn.Module):
         # Define architecture
         self.encoder = self.set_encoder()
         self.decoder = Generator(self.opts.output_size, 512, 8)
-        self.face_pool = torch.nn.AdaptiveAvgPool2d((256, 256))
+        self.face_pool = torch.nn.AdaptiveAvgPool2d(self._IMAGE_SIZE)
         # Load weights if needed
         self.load_weights()
 
