@@ -8,6 +8,8 @@ from models.convnext_age import RegressionModel
 
 class AgingLoss(nn.Module):
 
+    NORM_MEAN = torch.tensor([0.485, 0.456, 0.406]).cuda()
+    NORM_STD = torch.tensor([0.229, 0.224, 0.225]).cuda()
     def __init__(self, opts):
         super(AgingLoss, self).__init__()
         self.age_net = RegressionModel(model_name="convnext_pico", num_classes=100)
@@ -39,8 +41,8 @@ class AgingLoss(nn.Module):
 
         input_ages = self.extract_ages(y) / 100.0
         with torch.no_grad():
-            y_hat -= torch.tensor([0.485, 0.456, 0.406])[:, None, None][None, ...]
-            y_hat /= torch.tensor([0.229, 0.224, 0.225])[:, None, None][None, ...]
+            y_hat -= self.NORM_MEAN[:, None, None][None, ...]
+            y_hat /= self.NORM_STD[:, None, None][None, ...]
         output_ages = self.extract_ages(y_hat) / 100.0
 
         for i in range(n_samples):
