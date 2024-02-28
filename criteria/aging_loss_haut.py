@@ -11,6 +11,7 @@ class AgingLoss(nn.Module):
     def __init__(self, opts):
         super(AgingLoss, self).__init__()
         self.age_net = RegressionModel(model_name="convnext_pico", num_classes=100)
+        print('Loading age model from HautAI... Path is pretrained_models/age_model_cn_pico.pt')
         self.age_net.load_state_dict(
             torch.load("pretrained_models/age_model_cn_pico.pt", map_location="cpu")
         )
@@ -21,7 +22,7 @@ class AgingLoss(nn.Module):
         self.opts = opts
 
     def __get_predicted_age(self, age_pb):
-        return age_pb.argmax(1).astype(torch.float32)
+        return age_pb.argmax(1) * 1.0
 
     def extract_ages(self, x):
         x = F.interpolate(x, size=(320, 320), mode="bilinear")
