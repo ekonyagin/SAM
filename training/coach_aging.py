@@ -47,7 +47,7 @@ class Coach:
         if self.opts.w_norm_lambda > 0:
             self.w_norm_loss = w_norm.WNormLoss(opts=self.opts)
         if self.opts.aging_lambda > 0:
-            self.aging_loss = AgingLoss(self.opts)
+            self.aging_loss = AgingLoss(self.opts).to(self.device).eval()
 
         # Initialize optimizer
         self.optimizer = self.configure_optimizers()
