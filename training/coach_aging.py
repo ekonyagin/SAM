@@ -34,7 +34,7 @@ class Coach:
 
         self.device = "cuda"
         self.opts.device = self.device
-        self.resize_to_256 = torch.nn.AdaptiveAvgPool2d((256, 256))
+        self.resize_256 = torch.nn.AdaptiveAvgPool2d((256, 256))
 
         # Initialize network
         self.net = pSp(self.opts).to(self.device)
