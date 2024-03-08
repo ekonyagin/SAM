@@ -34,6 +34,7 @@ class Coach:
 
         self.device = "cuda"
         self.opts.device = self.device
+        self.resize_to_256 = torch.nn.AdaptiveAvgPool2d((256, 256))
 
         # Initialize network
         self.net = pSp(self.opts).to(self.device)
@@ -350,7 +351,7 @@ class Coach:
                 age_diffs = torch.abs(target_ages - input_ages)
                 weights = train_utils.compute_cosine_weights(x=age_diffs)
             loss_id, sim_improvement, id_logs = self.id_loss(
-                y_hat, y, x, label=data_type, weights=weights
+                self.resize_256(y_hat), self.resize_256(y), self.resize_256(x), label=data_type, weights=weights
             )
             loss_dict[f"loss_id_{data_type}"] = float(loss_id)
             loss_dict[f"id_improve_{data_type}"] = float(sim_improvement)
@@ -364,7 +365,7 @@ class Coach:
                 l2_lambda = self.opts.l2_lambda
             loss += loss_l2 * l2_lambda
         if self.opts.lpips_lambda > 0:
-            loss_lpips = self.lpips_loss(y_hat, y)
+            loss_lpips = self.lpips_loss(self.resize_256(y_hat), self.resize_256(y))
             loss_dict[f"loss_lpips_{data_type}"] = float(loss_lpips)
             if data_type == "real" and not no_aging:
                 lpips_lambda = self.opts.lpips_lambda_aging
@@ -373,13 +374,13 @@ class Coach:
             loss += loss_lpips * lpips_lambda
         if self.opts.lpips_lambda_crop > 0:
             loss_lpips_crop = self.lpips_loss(
-                y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220]
+                self.resize_256(y_hat[:, :, 35:223, 32:220]), self.resize_256(y[:, :, 35:223, 32:220])
             )
             loss_dict["loss_lpips_crop"] = float(loss_lpips_crop)
             loss += loss_lpips_crop * self.opts.lpips_lambda_crop
         if self.opts.l2_lambda_crop > 0:
             loss_l2_crop = F.mse_loss(
-                y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220]
+                y_hat[:, :, 70:446, 64:440], y[:, :, 70:446, 64:440]
             )
             loss_dict["loss_l2_crop"] = float(loss_l2_crop)
             loss += loss_l2_crop * self.opts.l2_lambda_crop
