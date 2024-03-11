@@ -1,4 +1,5 @@
 import cv2
+import jpeg4py as jpeg
 from torch.utils.data import Dataset
 
 from utils import data_utils
@@ -32,9 +33,13 @@ class ImagesDataset(Dataset):
 
     def __getitem__(self, index):
         from_path = self.source_paths[index]
+        extension = from_path.split(".")[-1]
+        if extension == 'jpg' or extension == 'jpeg':
+            from_im = jpeg.JPEG(from_path).decode()
+        else:
 
-        from_im = cv2.imread(from_path)
-        from_im = cv2.cvtColor(from_im, cv2.COLOR_BGR2RGB)
+            from_im = cv2.imread(from_path)
+            from_im = cv2.cvtColor(from_im, cv2.COLOR_BGR2RGB)
         from_im = cv2.resize(
             from_im,
             (self.target_size, self.target_size),
