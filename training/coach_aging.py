@@ -16,7 +16,6 @@ from configs import data_configs
 from criteria import id_loss, w_norm
 from criteria.aging_loss import AgingLoss
 from criteria.lpips.lpips import LPIPS
-from datasets.augmentations import AgeTransformer
 from datasets.images_dataset import ImagesDataset
 from models.psp import pSp
 from training.ranger import Ranger
@@ -24,6 +23,7 @@ from utils import common, train_utils
 
 
 class Coach:
+    _AGE_LIMITS = (35, 90)
 
     _TARGET_IMAGE_SIZE = 512
 
@@ -69,8 +69,6 @@ class Coach:
             num_workers=int(self.opts.test_workers),
             drop_last=True,
         )
-        print("self opts target age:", self.opts.target_age)
-        self.age_transformer = AgeTransformer(target_age=self.opts.target_age)
 
         # Initialize logger
         log_dir = os.path.join(opts.exp_dir, "logs")
@@ -111,9 +109,8 @@ class Coach:
                 if no_aging:
                     x_input = self.__set_target_to_source(x=x, input_ages=input_ages)
                 else:
-                    x_input = [
-                        self.age_transformer(img.cpu()).to(self.device) for img in x
-                    ]
+                    ages = np.random.randint(low=self._AGE_LIMITS[0], high=self._AGE_LIMITS[1], size=len(x))
+                    x_input = self.__set_target_to_source(x=x, input_ages=(1.*ages)/100)
 
                 x_input = torch.stack(x_input)
                 target_ages = x_input[:, -1, 0, 0]
@@ -216,9 +213,8 @@ class Coach:
                 if no_aging:
                     x_input = self.__set_target_to_source(x=x, input_ages=input_ages)
                 else:
-                    x_input = [
-                        self.age_transformer(img.cpu()).to(self.device) for img in x
-                    ]
+                    ages = np.random.randint(low=self._AGE_LIMITS[0], high=self._AGE_LIMITS[1], size=len(x))
+                    x_input = self.__set_target_to_source(x=x, input_ages=(1.*ages)/100)
 
                 x_input = torch.stack(x_input)
                 target_ages = x_input[:, -1, 0, 0]
