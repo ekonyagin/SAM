@@ -69,7 +69,7 @@ class Coach:
             num_workers=int(self.opts.test_workers),
             drop_last=True,
         )
-
+        print("self opts target age:", self.opts.target_age)
         self.age_transformer = AgeTransformer(target_age=self.opts.target_age)
 
         # Initialize logger
